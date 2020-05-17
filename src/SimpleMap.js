@@ -8,16 +8,28 @@ import MAPS_API_KEY from './config'
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
 const handleApiLoaded = (map, maps) => {
-	let url = 'https://raw.githubusercontent.com/underthecurve/bourdain-travel-places/master/bourdain_travel_places.csv';
+	let url = "https://raw.githubusercontent.com/alexanderjpowell/bourdain-destinations-react/master/src/latlng.csv";
 	fetch(url).then(response => response.text()).then(text => {
-		//alert(data.toString());
 		let lines = text.split('\n');
-		//alert(lines.length);
-		for (let i = 1; i < 3; i++) {
-			//let rows = lines[i].split(',');
-			var rows = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-			//rows = rows || [];
-			//alert(rows);
+		for (let i = 0; i < lines.length; i++) {
+			let row = lines[i].replace(/['"]+/g, '');
+			if (row !== 'NA') {
+				let latlng = row.split(',');
+				let lat = parseFloat(latlng[0]);
+				let lng = parseFloat(latlng[1]);
+				let position = { lat: lat, lng: lng };
+				let marker = new maps.Marker({
+					position: position,
+					map,
+					title: 'test'
+				});
+				var infowindow = new maps.InfoWindow({
+					content: '<div><h3>Info</h3></div>'
+				});
+				marker.addListener('click', function() {
+					infowindow.open(map, marker);
+				});
+			}
 		}
 	});
 };
@@ -42,8 +54,6 @@ class SimpleMap extends Component {
           yesIWantToUseGoogleMapApiInternals
           onGoogleApiLoaded={({ map, maps }) => handleApiLoaded(map, maps)}
         >
-        <RoomIcon lat={59.955413} lng={30.337844}/>
-        <RoomIcon lat={27.84} lng={11.11}/>
         </GoogleMapReact>
       </div>
     </div>
