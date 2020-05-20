@@ -5,36 +5,6 @@ import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
 import MAPS_API_KEY from './config';
 
-/*function drawMarkers(map, maps, shows) {
-	let url = "https://raw.githubusercontent.com/alexanderjpowell/bourdain-destinations-react/master/src/all.json";
-	fetch(url).then(response => response.json()).then(json => {
-		var marker;
-		var infowindow = new maps.InfoWindow();
-		for (let i = 0; i < json.length; i++) {
-			if (shows.includes(json[i].show)) {
-			let coords = json[i].coordinates.split(',');
-			let position = { lat: parseFloat(coords[0]), lng: parseFloat(coords[1]) };
-			marker = new maps.Marker({
-				position: position,
-				map,
-			});
-			maps.event.addListener(marker, 'click', (function(marker, i) {
-				return function() {
-					let showNameAndEpisode = json[i].show + ' Season ' + json[i].season + ', Episode ' + json[i].ep;
-					let title = json[i].title;
-					let state = (json[i].state === 'NA') ? '' : ', ' + json[i].state;
-					let location = json[i].city_or_area + state + ', ' + json[i].country;
-					let content = '<div><a href="' + json[i].source + '" target="_blank">' + showNameAndEpisode + ': ' + title + '</a></div>'
-							+ '<div>' + location + '</div>';
-					infowindow.setContent(content);
-					infowindow.open(map, marker);
-				}
-			})(marker, i));
-			}
-		}
-	}).catch(error => {alert(error);});
-}*/
-
 const LegendStyle = {
 	margin: 10,
 	padding: 8,
@@ -51,34 +21,30 @@ class SimpleMap extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			//markers: [<AnyReactComponent lat={27.84} lng={11.11} text='Test' />],
 			markers: [],
+			map: null,
+			noReservations: true,
+			theLayover: true,
+			partsUnknown: true,
 		};
 	}
 
 	handleApiLoaded = (map, maps) => {
-		//alert('handleApiLoaded');
+		this.setState({ map: map });
 		var legend = document.getElementById('legend');
 		map.controls[maps.ControlPosition.BOTTOM_CENTER].push(legend);
-		//drawMarkers(map, maps, ['No Reservations', 'The Layover', 'Parts Unknown']);
-		//
-		//var marker = new maps.Marker({ position: {'lat': 27.84, 'lng': 11.11}, map });
-		//this.setState({markers: [marker]});
-		//marker.setMap(map);
-		//marker.setMap(null);
-		//
 		let url = "https://raw.githubusercontent.com/alexanderjpowell/bourdain-destinations-react/master/src/all.json";
 		fetch(url).then(response => response.json()).then(json => {
 			var marker;
 			var markers = [];
 			var infowindow = new maps.InfoWindow();
 			for (let i = 0; i < json.length; i++) {
-				//if (shows.includes(json[i].show)) {
 				let coords = json[i].coordinates.split(',');
 				let position = { lat: parseFloat(coords[0]), lng: parseFloat(coords[1]) };
 				marker = new maps.Marker({
 					position: position,
 					map,
+					show: json[i].show,
 				});
 				maps.event.addListener(marker, 'click', (function(marker, i) {
 					return function() {
@@ -93,7 +59,6 @@ class SimpleMap extends Component {
 					}
 				})(marker, i));
 				markers.push(marker);
-				//}
 			}
 			this.setState({ markers: markers });
 		}).catch(error => {alert(error);});
@@ -107,17 +72,55 @@ class SimpleMap extends Component {
 		zoom: 1
 	};
 
-	// setMap(null)
-	handleNoReservationsClick() {
+	handleNoReservationsClick = () => {
+		if (this.state.noReservations) {
+			for (let i = 0; i < this.state.markers.length; i++) {
+				if (this.state.markers[i].show === 'No Reservations') {
+					this.state.markers[i].setMap(null);
+				}
+			}
+		} else {
+			for (let i = 0; i < this.state.markers.length; i++) {
+				if (this.state.markers[i].show === 'No Reservations') {
+					this.state.markers[i].setMap(this.state.map);
+				}
+			}
+		}
+		this.setState({ noReservations: !this.state.noReservations });
 	};
 
 	handleTheLayoverClick = () => {
-		for (let i = 0; i < this.state.markers.length; i++) {
-			this.state.markers[i].setMap(null);
+		if (this.state.theLayover) {
+			for (let i = 0; i < this.state.markers.length; i++) {
+				if (this.state.markers[i].show === 'The Layover') {
+					this.state.markers[i].setMap(null);
+				}
+			}
+		} else {
+			for (let i = 0; i < this.state.markers.length; i++) {
+				if (this.state.markers[i].show === 'The Layover') {
+					this.state.markers[i].setMap(this.state.map);
+				}
+			}
 		}
+		this.setState({ theLayover: !this.state.theLayover });
 	};
 
-	handlePartsUnknownClick() {
+	handlePartsUnknownClick = () => {
+		if (this.state.partsUnknown) {
+			for (let i = 0; i < this.state.markers.length; i++) {
+				if (this.state.markers[i].show === 'Parts Unknown') {
+					this.state.markers[i].setMap(null);
+				}
+			}
+		} else {
+			for (let i = 0; i < this.state.markers.length; i++) {
+				if (this.state.markers[i].show === 'Parts Unknown') {
+					this.state.markers[i].setMap(this.state.map);
+				}
+			}
+		}
+		this.setState({ partsUnknown: !this.state.partsUnknown });
 	};
 
   render() {
@@ -131,8 +134,6 @@ class SimpleMap extends Component {
 					yesIWantToUseGoogleMapApiInternals
 					onGoogleApiLoaded={({ map, maps }) => this.handleApiLoaded(map, maps)}
 				>
-					
-					{/*{this.state.markers}*/}
 				</GoogleMapReact>
 				<div id="legend">
 					<Grid container spacing={3}>
