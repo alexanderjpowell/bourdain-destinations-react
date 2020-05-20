@@ -1,18 +1,9 @@
 import React, { Component } from 'react';
-//import controllable from 'react-controllables';
 import GoogleMapReact from 'google-map-react';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
 import MAPS_API_KEY from './config';
-
-const AnyReactComponent = ({ text }) => <div>{text}</div>;
-
-/*const handleApiLoaded = (map, maps) => {
-	//var legend = document.getElementById('legend');
-	//map.controls[maps.ControlPosition.BOTTOM_CENTER].push(legend);
-	//drawMarkers(map, maps, ['No Reservations', 'The Layover', 'Parts Unknown']);
-};*/
 
 /*function drawMarkers(map, maps, shows) {
 	let url = "https://raw.githubusercontent.com/alexanderjpowell/bourdain-destinations-react/master/src/all.json";
@@ -71,14 +62,15 @@ class SimpleMap extends Component {
 		map.controls[maps.ControlPosition.BOTTOM_CENTER].push(legend);
 		//drawMarkers(map, maps, ['No Reservations', 'The Layover', 'Parts Unknown']);
 		//
-		var marker = new maps.Marker({ position: {'lat': 27.84, 'lng': 11.11}, map });
-		this.setState({markers: [marker]});
+		//var marker = new maps.Marker({ position: {'lat': 27.84, 'lng': 11.11}, map });
+		//this.setState({markers: [marker]});
 		//marker.setMap(map);
 		//marker.setMap(null);
 		//
 		let url = "https://raw.githubusercontent.com/alexanderjpowell/bourdain-destinations-react/master/src/all.json";
-		/*fetch(url).then(response => response.json()).then(json => {
+		fetch(url).then(response => response.json()).then(json => {
 			var marker;
+			var markers = [];
 			var infowindow = new maps.InfoWindow();
 			for (let i = 0; i < json.length; i++) {
 				//if (shows.includes(json[i].show)) {
@@ -100,13 +92,12 @@ class SimpleMap extends Component {
 						infowindow.open(map, marker);
 					}
 				})(marker, i));
+				markers.push(marker);
 				//}
 			}
-		}).catch(error => {alert(error);});*/
+			this.setState({ markers: markers });
+		}).catch(error => {alert(error);});
 	};
-
-	componentDidMount() {
-	}
 
 	static defaultProps = {
 		center: {
@@ -116,11 +107,14 @@ class SimpleMap extends Component {
 		zoom: 1
 	};
 
+	// setMap(null)
 	handleNoReservationsClick() {
 	};
 
 	handleTheLayoverClick = () => {
-		this.state.markers[0].setMap(null);
+		for (let i = 0; i < this.state.markers.length; i++) {
+			this.state.markers[i].setMap(null);
+		}
 	};
 
 	handlePartsUnknownClick() {
